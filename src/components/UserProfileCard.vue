@@ -40,6 +40,12 @@
             >
               追蹤
             </button>
+            <router-link
+              :to="{ name: 'user-profile-edit', params: { id: profile.id } }"
+              class="btn btn-primary"
+            >
+              edit
+            </router-link>
           </form>
           <p></p>
         </div>
@@ -78,11 +84,11 @@ export default {
   },
   methods: {
     handleUnfollowBtnClick() {
-      this.$emit('after-unfollow')
+      this.$emit("after-unfollow");
     },
     handleFollowBtnClick() {
       // todo: api
-      this.$emit('after-follow')
+      this.$emit("after-follow");
     },
   },
 };

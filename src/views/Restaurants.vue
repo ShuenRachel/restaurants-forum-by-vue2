@@ -59,7 +59,6 @@ export default {
           categoryId: queryCategoryId,
         });
 
-        console.log(response);
         if (response.statusText !== "OK") {
           throw new Error(response.message);
         }
@@ -92,10 +91,22 @@ export default {
     },
   },
   created() {
+    const { page = '', categoryId = '' } = this.$route.query
+
     this.fetchRestaurants({
-      queryPage: 1,
-      queryCategoryId: "",
+      queryPage: page,
+      queryCategoryId: categoryId,
     });
   },
+  beforeRouteUpdate (to, from, next) {
+      const { page = '', categoryId = '' } = to.query
+
+      this.fetchRestaurants({
+          queryPage: page,
+          queryCategoryId: categoryId
+      })
+
+      next()
+  }
 };
 </script>

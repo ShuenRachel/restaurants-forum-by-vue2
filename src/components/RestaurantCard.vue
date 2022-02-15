@@ -124,7 +124,7 @@ export default {
       try {
         const { data } = await usersAPI.addLike({ restaurantId });
 
-        if (data.status === "success") {
+        if (data.status !== "success") {
           throw new Error(data.message);
         }
 
@@ -145,7 +145,7 @@ export default {
       try {
         const { data } = await usersAPI.deleteLike({ restaurantId });
 
-        if (data.status === "success") {
+        if (data.status !== "success") {
           throw new Error(data.message);
         }
 
@@ -162,18 +162,6 @@ export default {
         console.log(error);
       }
     },
-    // addLike() {
-    //   this.restaurant = {
-    //     ...this.restaurant,
-    //     isLiked: true,
-    //   };
-    // },
-    // removeLike() {
-    //   this.restaurant = {
-    //     ...this.restaurant,
-    //     isLiked: false,
-    //   };
-    // },
   },
 };
 </script>

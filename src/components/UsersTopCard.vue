@@ -95,18 +95,6 @@ export default {
         console.log(error);
       }
     },
-    // followUser() {
-    //   this.user = {
-    //     ...this.user,
-    //     isFollowed: true
-    //   }
-    // },
-    // unfollowUser() {
-    //   this.user = {
-    //     ...this.user,
-    //     isFollowed: false
-    //   }
-    // },
   },
 };
 </script>

@@ -92,19 +92,8 @@ export default {
         (comment) => comment.id !== commentId
       );
     },
-    afterCreateComment(payload) {
-      const { commentId, restaurantId, text } = payload;
-
-      this.restaurantComments.push({
-        id: commentId,
-        RestaurantId: restaurantId,
-        User: {
-          id: this.currentUser.id,
-          name: this.currentUser.name,
-        },
-        text,
-        createdAt: new Date(),
-      });
+    afterCreateComment() {
+      this.fetchRestaurant(this.restaurant.id)
     },
   },
   created() {

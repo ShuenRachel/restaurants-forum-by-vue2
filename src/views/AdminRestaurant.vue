@@ -58,6 +58,7 @@ export default {
         tel: "",
         address: "",
         description: "",
+        category: ""
       },
     };
   },
@@ -81,7 +82,7 @@ export default {
           CategoryId: categoryId,
           Category: category,
         } = data.restaurant;
-console.log(data.restaurant)
+        console.log(data.restaurant);
         this.restaurant = {
           ...this.restaurant,
           id,
@@ -92,17 +93,22 @@ console.log(data.restaurant)
           description,
           image,
           categoryId,
-          category
+          category,
         };
-        console.log(this.restaurant)
+        console.log(this.restaurant);
       } catch (error) {
         console.log(error);
         Toast.fire({
-          icon: 'error',
-          title: '無法取得餐廳資料，請稍後再試'
-        })
+          icon: "error",
+          title: "無法取得餐廳資料，請稍後再試",
+        });
       }
     },
+  },
+  beforeRouteUpdate(to, from, next) {
+    const { id } = to.params;
+    this.fetchRestaurant(id);
+    next();
   },
 };
 </script>

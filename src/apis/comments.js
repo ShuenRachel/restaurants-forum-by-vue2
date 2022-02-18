@@ -5,6 +5,10 @@ const getToken = () => localStorage.getItem("token");
 
 export default {
   delete({ commentId }) {
-    return apiHelper.delete(`/comments/${}`)
+    return apiHelper.delete(`/comments/${commentId}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
   }
 }

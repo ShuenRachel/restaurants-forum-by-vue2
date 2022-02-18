@@ -34,17 +34,9 @@
 
 <script>
 import { fromNowFilter } from './../utils/mixin'
-
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: '管理者',
-    email: 'root@example.com',
-    image: 'https://i.pravatar.cc/300',
-    isAdmin: true
-  },
-  isAuthenticated: true
-}
+import commentsAPI from "./../apis/comments";
+import { Toast } from "./../utils/helpers";
+import { mapState } from "vuex"
 
 export default {
   mixins: [fromNowFilter],
@@ -54,17 +46,27 @@ export default {
       required: true
     }
   },
-  data () {
-    return {
-      currentUser: dummyUser.currentUser
+  methods: {
+    async handleDeleteButton(commentId) {
+      try {
+        const { data } = await commentsAPI.delete({ commentId });
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+        this.$emit('after-delete-comment', commentId)
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "無法刪除評論，請稍後再試",
+        });
+      }
     }
   },
-  methods: {
-    handleDeleteButton(commentId) {
-      // TODO: 請求 API 伺服器刪除 id 為 commentId 的評論
-      // 觸發父層事件 - $emit( '事件名稱' , 傳遞的資料 )
-      this.$emit('after-delete-comment', commentId)
-    }
+  computed: {
+    ...mapState(['currentUser'])
   }
 }
 </script>

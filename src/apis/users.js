@@ -10,7 +10,7 @@ export default {
     });
   },
   get({ userId }) {
-    return apiHelper.get(`users/${userId}`, {
+    return apiHelper.get(`/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },

@@ -20,7 +20,7 @@
             @click.stop.prevent="createCategory"
             :disabled="isProcessing"
           >
-            {{ isProcessing ?  "處理中..." : "新增" }}
+            {{ isProcessing ? "處理中..." : "新增" }}
           </button>
         </div>
       </div>
@@ -102,7 +102,7 @@ export default {
     return {
       categories: [],
       newCategoryName: "",
-      isProcessing: false
+      isProcessing: false,
     };
   },
   created() {
@@ -125,20 +125,18 @@ export default {
       }
     },
     async createCategory() {
-      if(!this.newCategoryName.length) {
+      if (!this.newCategoryName.length) {
         Toast.fire({
-          icon: 'warning',
-          title: '請填寫類別'
-        })
-        return
+          icon: "warning",
+          title: "請填寫類別",
+        });
+        return;
       }
       try {
-        this.isProcessing = true
+        this.isProcessing = true;
         const { data } = await adminAPI.categories.create({
           name: this.newCategoryName.trim(),
         });
-
-        console.log(data);
 
         if (data.status !== "success") {
           throw new Error(data.message);
@@ -146,21 +144,43 @@ export default {
 
         this.newCategoryName = "";
 
-        this.isProcessing = false
-        this.fetchCategories()
+        this.isProcessing = false;
+        this.fetchCategories();
       } catch (error) {
-        this.isProcessing = false
-        console.log(error)
+        this.isProcessing = false;
+        console.log(error);
         Toast.fire({
           icon: "error",
           title: "無法新增餐廳類別，請稍後再試",
         });
       }
     },
-    updateCategory({ categoryId, name }) {
-      console.log(name);
+    async updateCategory({ categoryId, name }) {
+      if(!name.trim().length) {
+        Toast.fire({
+          icon: "warning",
+          title: "請輸入類別",
+        });
+        return;
+      }
 
-      // todo: api
+      try {
+        const { data } = await adminAPI.categories.update({
+          categoryId,
+          name: name.trim(),
+        });
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "無法更新餐廳類別，請稍後再試",
+        });
+      }
 
       this.toggleIsEditing(categoryId);
     },

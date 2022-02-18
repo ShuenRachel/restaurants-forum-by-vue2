@@ -113,5 +113,13 @@ export default {
       };
     },
   },
+  watch: {
+    initialRestaurant (newValue) {
+      this.restaurant = {
+        ...this.restaurant,
+        ...newValue
+      }
+    }
+  }
 };
 </script>

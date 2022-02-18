@@ -8,6 +8,11 @@ export default {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
     },
+    create({ name }) {
+      return apiHelper.post("/admin/categories", { name }, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+    },
   },
   restaurants: {
     create({ formData }) {
@@ -25,7 +30,7 @@ export default {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
     },
-    update ({ restaurantId, formData }) {
+    update({ restaurantId, formData }) {
       return apiHelper.put(`/admin/restaurants/${restaurantId}`, formData, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });

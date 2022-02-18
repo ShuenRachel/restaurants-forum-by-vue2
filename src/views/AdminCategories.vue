@@ -18,8 +18,9 @@
             type="button"
             class="btn btn-primary"
             @click.stop.prevent="createCategory"
+            :disabled="isProcessing"
           >
-            新增
+            {{ isProcessing ?  "處理中..." : "新增" }}
           </button>
         </div>
       </div>
@@ -47,11 +48,13 @@
               type="text"
               class="form-control"
             />
-            <span 
-              v-show="category.isEditing" 
+            <span
+              v-show="category.isEditing"
               class="cancel"
               @click.stop.prevent="handleCancel(category.id)"
-            > ✕ </span>
+            >
+              ✕
+            </span>
           </td>
           <td class="d-flex justify-content-between">
             <button
@@ -66,7 +69,9 @@
               v-show="category.isEditing"
               type="button"
               class="btn btn-link mr-2"
-              @click.stop.prevent="updateCategory({ categoryId: category.id, name: category.name })"
+              @click.stop.prevent="
+                updateCategory({ categoryId: category.id, name: category.name })
+              "
             >
               Save
             </button>
@@ -86,38 +91,8 @@
 
 <script>
 import AdminNav from "@/components/AdminNav";
-import { v4 as uuidv4 } from "uuid";
-import adminAPI from './../apis/admin'
-import { Toast } from './../utils/helpers'
-
-// const dummyData = {
-//   categories: [
-//     {
-//       id: 1,
-//       name: "中式料理",
-//       createdAt: "2019-06-22T09:00:43.000Z",
-//       updatedAt: "2019-06-22T09:00:43.000Z",
-//     },
-//     {
-//       id: 2,
-//       name: "日本料理",
-//       createdAt: "2019-06-22T09:00:43.000Z",
-//       updatedAt: "2019-06-22T09:00:43.000Z",
-//     },
-//     {
-//       id: 3,
-//       name: "義大利料理",
-//       createdAt: "2019-06-22T09:00:43.000Z",
-//       updatedAt: "2019-06-22T09:00:43.000Z",
-//     },
-//     {
-//       id: 4,
-//       name: "墨西哥料理",
-//       createdAt: "2019-06-22T09:00:43.000Z",
-//       updatedAt: "2019-06-22T09:00:43.000Z",
-//     },
-//   ],
-// };
+import adminAPI from "./../apis/admin";
+import { Toast } from "./../utils/helpers";
 
 export default {
   components: {
@@ -127,6 +102,7 @@ export default {
     return {
       categories: [],
       newCategoryName: "",
+      isProcessing: false
     };
   },
   created() {
@@ -135,35 +111,58 @@ export default {
   methods: {
     async fetchCategories() {
       try {
-        const { data } = await adminAPI.categories.get()
+        const { data } = await adminAPI.categories.get();
         this.categories = data.categories.map((category) => ({
-        ...category,
-        isEditing: false,
-        nameCached: '',
-      }))
+          ...category,
+          isEditing: false,
+          nameCached: "",
+        }));
       } catch (error) {
         Toast.fire({
-          icon: 'error',
-          title: '無法取得餐廳類別，請稍後再試'
-        })
+          icon: "error",
+          title: "無法取得餐廳類別，請稍後再試",
+        });
       }
     },
-    createCategory() {
-      // todo: post to api
+    async createCategory() {
+      if(!this.newCategoryName.length) {
+        Toast.fire({
+          icon: 'warning',
+          title: '請填寫類別'
+        })
+        return
+      }
+      try {
+        this.isProcessing = true
+        const { data } = await adminAPI.categories.create({
+          name: this.newCategoryName.trim(),
+        });
 
-      this.categories.push({
-        id: uuidv4(),
-        name: this.newCategoryName,
-      });
+        console.log(data);
 
-      this.newCategoryName = "";
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+        this.newCategoryName = "";
+
+        this.isProcessing = false
+        this.fetchCategories()
+      } catch (error) {
+        this.isProcessing = false
+        console.log(error)
+        Toast.fire({
+          icon: "error",
+          title: "無法新增餐廳類別，請稍後再試",
+        });
+      }
     },
-    updateCategory ({ categoryId, name }) {
-      console.log(name)
-      
+    updateCategory({ categoryId, name }) {
+      console.log(name);
+
       // todo: api
 
-      this.toggleIsEditing(categoryId)
+      this.toggleIsEditing(categoryId);
     },
     deleteCategory(categoryId) {
       // todo: post to api
@@ -173,32 +172,32 @@ export default {
       );
     },
     toggleIsEditing(categoryId) {
-      this.categories = this.categories.map(category => {
+      this.categories = this.categories.map((category) => {
         if (category.id === categoryId) {
           return {
             ...category,
             isEditing: !category.isEditing,
-            nameCached: category.name
-          }
+            nameCached: category.name,
+          };
         }
 
-        return category
-      })
+        return category;
+      });
     },
     handleCancel(categoryId) {
-      this.categories = this.categories.map(category => {
+      this.categories = this.categories.map((category) => {
         if (category.id === categoryId) {
           return {
             ...category,
-            name: category.nameCached
-          }
+            name: category.nameCached,
+          };
         }
 
-        return category
-      })
+        return category;
+      });
 
-      this.toggleIsEditing(categoryId)
-    }
+      this.toggleIsEditing(categoryId);
+    },
   },
 };
 </script>

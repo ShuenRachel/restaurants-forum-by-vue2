@@ -62,8 +62,12 @@
         />
       </div>
 
-      <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">
-        Submit
+      <button
+        class="btn btn-lg btn-primary btn-block mb-3"
+        type="submit"
+        :disabled="isProcessing"
+      >
+        {{ isProcessing ? "處理中..." : "送出" }}
       </button>
 
       <div class="text-center mb-3">
@@ -78,6 +82,9 @@
 </template>
 
 <script>
+import authorizationAPI from "./../apis/authorization";
+import { Toast } from "./../utils/helpers";
+
 export default {
   data() {
     return {
@@ -85,18 +92,65 @@ export default {
       email: "",
       password: "",
       passwordCheck: "",
+      isProcessing: false,
     };
   },
   methods: {
-    handleSubmit() {
-      const data = JSON.stringify({
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        passwordCheck: this.passwordCheck,
-      });
+    async handleSubmit() {
+      if (!this.name) {
+        Toast.fire({
+          icon: "warning",
+          title: "請填寫名稱",
+        });
+        return;
+      } else if (!this.email) {
+        Toast.fire({
+          icon: "warning",
+          title: "請填寫Email",
+        });
+        return;
+      } else if (!this.password || !this.passwordCheck) {
+        Toast.fire({
+          icon: "warning",
+          title: "請填寫密碼",
+        });
+        return;
+      } else if (this.password !== this.passwordCheck) {
+        Toast.fire({
+          icon: "warning",
+          title: "請確保兩次密碼一致",
+        });
+        return;
+      }
+      
+      try {
+        this.isProcessing = true;
 
-      console.log('data:', data)
+        const { data } = await authorizationAPI.signUp({
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          passwordCheck: this.passwordCheck,
+        });
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+        console.log(data);
+        this.$router.push({ name: "sign-in" });
+      } catch (error) {
+        this.password = "";
+        this.passwordCheck = "";
+        Toast.fire({
+          icon: "warning",
+          title: "無法建立帳號，請稍後再試",
+        });
+
+        this.isProcessing = false;
+
+        console.log("error|", error);
+      }
     },
   },
 };

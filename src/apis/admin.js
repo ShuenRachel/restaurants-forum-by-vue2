@@ -26,6 +26,14 @@ export default {
         }
       );
     },
+    delete({ categoryId }) {
+      return apiHelper.delete(
+        `/admin/categories/${categoryId}`,
+        {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        }
+      );
+    },
   },
   restaurants: {
     create({ formData }) {
